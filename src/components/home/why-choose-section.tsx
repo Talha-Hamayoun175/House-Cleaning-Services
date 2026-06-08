@@ -23,7 +23,7 @@ export function WhyChooseSection() {
                   <h3 className="mt-5 font-heading text-lg font-semibold text-primary">
                     {item.title}
                   </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-text">{item.description}</p>
+                  <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-text min-h-[46px]">{item.description}</p>
                 </div>
               </StaggerItem>
             );

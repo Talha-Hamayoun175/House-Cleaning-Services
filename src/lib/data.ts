@@ -66,7 +66,7 @@ export const services: Service[] = [
     benefits: ["Move-in ready", "Appliance detail", "Grime removal"],
     priceFrom: 149,
     image:
-      "https://images.unsplash.com/photo-1628177102876-ef41a1f2a7cb?w=800&q=80",
+      "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80",
     icon: "sparkles",
   },
   {
@@ -138,7 +138,7 @@ export const services: Service[] = [
     benefits: ["Deep extraction", "Allergen reduction", "Quick dry"],
     priceFrom: 69,
     image:
-      "https://images.unsplash.com/photo-1600566753190-17f0baa5a6a3?w=800&q=80",
+      "https://plus.unsplash.com/premium_photo-1677362887432-2c95e4437496?q=80",
     icon: "layers",
   },
   {

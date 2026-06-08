@@ -37,7 +37,7 @@ export function ServiceCard({ service, detailed = false }: ServiceCardProps) {
         </div>
         <CardContent className="p-6">
           <h3 className="font-heading text-xl font-semibold text-primary">{service.title}</h3>
-          <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-text">
+          <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-text min-h-[70px]">
             {service.description}
           </p>
           {detailed && (
@@ -50,10 +50,10 @@ export function ServiceCard({ service, detailed = false }: ServiceCardProps) {
               ))}
             </ul>
           )}
-          <div className="mt-4 flex items-center justify-between">
-            <p className="text-sm font-medium text-primary">
+          <div className="mt-1 flex items-center justify-end">
+            {/* <p className="text-sm font-medium text-primary">
               From <span className="text-lg font-bold text-teal">${service.priceFrom}</span>
-            </p>
+            </p> */}
             <Button asChild variant="ghost" size="sm" className="group/btn">
               <Link href="/booking">
                 Book
