@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,22 +15,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { BOOKING_SUCCESS_MESSAGE } from "@/lib/constants";
 import { services } from "@/lib/data";
-
-const bookingSchema = z.object({
-  fullName: z.string().min(2, "Name must be at least 2 characters"),
-  phone: z.string().min(10, "Please enter a valid phone number"),
-  whatsapp: z.string().optional(),
-  email: z.string().email("Please enter a valid email"),
-  serviceType: z.string().min(1, "Please select a service"),
-  propertyType: z.string().min(1, "Please select property type"),
-  address: z.string().min(5, "Please enter your address"),
-  preferredDate: z.string().min(1, "Please select a date"),
-  preferredTime: z.string().min(1, "Please select a time"),
-  notes: z.string().optional(),
-});
-
-type BookingFormData = z.infer<typeof bookingSchema>;
+import {
+  bookingFormSchema,
+  type BookingFormData,
+} from "@/lib/validations/booking";
 
 export function BookingForm() {
   const [submitted, setSubmitted] = useState(false);
@@ -45,7 +34,13 @@ export function BookingForm() {
     formState: { errors, isSubmitting },
     reset,
   } = useForm<BookingFormData>({
-    resolver: zodResolver(bookingSchema),
+    resolver: zodResolver(bookingFormSchema),
+    defaultValues: {
+      serviceType: "",
+      propertyType: "",
+      preferredTime: "",
+      website: "",
+    },
   });
 
   const serviceType = watch("serviceType");
@@ -54,13 +49,30 @@ export function BookingForm() {
 
   async function onSubmit(data: BookingFormData) {
     setError(null);
+
     try {
-      await new Promise((r) => setTimeout(r, 1500));
-      console.log("Booking submitted:", data);
+      const response = await fetch("/api/booking", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      const result = (await response.json()) as { error?: string };
+
+      if (!response.ok) {
+        setError(
+          result.error ??
+            "We could not submit your booking right now. Please try again.",
+        );
+        return;
+      }
+
       setSubmitted(true);
       reset();
     } catch {
-      setError("Something went wrong. Please try again or contact us directly.");
+      setError(
+        "We could not submit your booking right now. Please check your connection and try again.",
+      );
     }
   }
 
@@ -78,9 +90,7 @@ export function BookingForm() {
         <h3 className="mt-4 font-heading text-xl font-semibold text-primary">
           Booking Request Received!
         </h3>
-        <p className="mt-2 text-text">
-          Thank you! Our team will contact you within 2 hours to confirm your appointment.
-        </p>
+        <p className="mt-2 text-text">{BOOKING_SUCCESS_MESSAGE}</p>
         <Button className="mt-6" onClick={() => setSubmitted(false)}>
           Book Another Service
         </Button>
@@ -96,6 +106,16 @@ export function BookingForm() {
         </div>
       )}
 
+      <div className="hidden" aria-hidden="true">
+        <Label htmlFor="website">Website</Label>
+        <Input
+          id="website"
+          tabIndex={-1}
+          autoComplete="off"
+          {...register("website")}
+        />
+      </div>
+
       <div className="grid gap-6 sm:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="fullName">Full Name *</Label>
@@ -106,7 +126,7 @@ export function BookingForm() {
         </div>
         <div className="space-y-2">
           <Label htmlFor="phone">Phone Number *</Label>
-          <Input id="phone" type="tel" {...register("phone")} placeholder="+1 (555) 000-0000" />
+          <Input id="phone" type="tel" {...register("phone")} placeholder="+61 426 000002" />
           {errors.phone && (
             <p className="text-sm text-red-600">{errors.phone.message}</p>
           )}
@@ -114,6 +134,9 @@ export function BookingForm() {
         <div className="space-y-2">
           <Label htmlFor="whatsapp">WhatsApp Number</Label>
           <Input id="whatsapp" type="tel" {...register("whatsapp")} placeholder="Optional" />
+          {errors.whatsapp && (
+            <p className="text-sm text-red-600">{errors.whatsapp.message}</p>
+          )}
         </div>
         <div className="space-y-2">
           <Label htmlFor="email">Email *</Label>
@@ -206,6 +229,9 @@ export function BookingForm() {
           {...register("notes")}
           placeholder="Special instructions, access codes, pets, etc."
         />
+        {errors.notes && (
+          <p className="text-sm text-red-600">{errors.notes.message}</p>
+        )}
       </div>
 
       <Button type="submit" size="lg" className="w-full sm:w-auto" disabled={isSubmitting}>
